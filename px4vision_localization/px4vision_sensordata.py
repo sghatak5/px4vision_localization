@@ -4,10 +4,14 @@ import rclpy
 from rclpy.node import Node
 from rclpy.qos import QoSProfile, ReliabilityPolicy, DurabilityPolicy, HistoryPolicy
 from px4_msgs.msg import SensorCombined, SensorGps
+from utilities.frd_to_ned import frd_to_ned
+from utilities.get_orientation import get_orientation
 
 class Px4VisionSensorData(Node):
     def __init__(self):
         super().__init__('px4vision_sensordata')
+        self.previous_time = None
+        self.dt = 0
 
         #qos profile for publishing and subscribing
         qos_profile = QoSProfile(
@@ -32,11 +36,23 @@ class Px4VisionSensorData(Node):
                                 \n Velocity_vz (Down): {msg.vel_d_m_s} ")
 
     def vehicle_imu_callback(self, msg: SensorCombined):
-        self.get_logger().info(f"IMU Sensor Data:\n Time: {msg.timestamp} \
-                                \n Angular Velocity (X): {msg.gyro_rad[0]} \
-                                \n Angular Velocity (Y): {msg.gyro_rad[1]} \
-                                \n Angular Velocity (Z): {msg.gyro_rad[2]}")
 
+        if self.previous_time is not None:
+            self.dt = msg.timestamp - self.previous_time
+            self.dt = self.dt / 1e9 #Coverting to seconds
+            self.previous_time = msg.timestamp
+        else:
+            self.previous_time = msg.timestamp
+
+        Angular_Velocity = frd_to_ned(msg.gyro_rad[0], msg.gyro_rad[1], msg.gyro_rad[2])
+        Orientation = get_orientation(Angular_Velocity, self.dt)
+        self.get_logger().info(f"IMU Sensor Data:\n Time: {msg.timestamp} \
+                                \n Angular Velocity (X): {Angular_Velocity[0]} \
+                                \n Angular Velocity (Y): {Angular_Velocity[1]} \
+                                \n Angular Velocity (Z): {Angular_Velocity[2]} \
+                                \n Orientation (X): {Orientation[0]} \
+                                \n Orientation (Y): {Orientation[1]} \
+                                \n Orientation (Z): {Orientation[2]} ")
 
 
 def main(args=None):
