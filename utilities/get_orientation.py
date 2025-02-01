@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import numpy as np
 
-def get_orientation(angular_velocity, dt):
+def getOrientation(angular_velocity, dt):
     """
     Function to get orientation from angular velocity
     """
@@ -19,5 +19,5 @@ def get_orientation(angular_velocity, dt):
     orientation[0] += dphi * dt
     orientation[1] += dtheta * dt
     orientation[2] += dpsi * dt
-    
+
     return orientation

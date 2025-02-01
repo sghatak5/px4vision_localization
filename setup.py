@@ -20,6 +20,9 @@ setup(
     entry_points={
         'console_scripts': [
             'px4vision_sensordata = px4vision_localization.px4vision_sensordata:main',
+            'ekf = px4vision_localization.ekf:main',
+            'createPlot = px4vision_localization.createPlot:main',
+            'px4visionEKFLocalization = px4vision_localization.localization:main',
         ],
     },
 )

@@ -2,5 +2,8 @@
 
 import numpy as np
 
-def frd_to_ned(x, y, z):
+def frdToNed(x, y, z):
+    """
+    Function to convert from FRD to NED
+    """
     return np.array([x, -y, -z])
